@@ -314,7 +314,7 @@ class Trainer:
             try:
                 _, loss, global_step = self.sess.run([self.train_op, self.loss_op, self.global_step],
                                                      feed_dict={self.is_training: True,
-                                                                self.train_dataset.handle: self.train_dataset.training_handle})
+                                                                self.train_dataset.ds_handle_ph: self.train_dataset.training_handle})
                 # total_loss += loss
 
                 if step % self.config.summary_interval == 0:
