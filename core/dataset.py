@@ -8,7 +8,7 @@ from tensorflow.contrib.data.python.ops import threadpool
 
 class Dataset(object):
     def __init__(self, sess, batch_size, shuffle, is_training, config, dataset_path, input_size):
-        self.handle = tf.placeholder(tf.string, shape=[])
+        self.ds_handle_ph = tf.placeholder(tf.string, shape=[])
         self.sess = sess
         self.config = config
         self.input_size = input_size
@@ -43,7 +43,7 @@ class Dataset(object):
         # ds = ds.repeat()
         if shuffle:
             ds = ds.shuffle(buffer_size=config.buffer_size)
-        if config.num_gpus > 1:
+        if True:  # config.num_gpus > 1:
             batch_size_per_split = batch_size // config.num_gpus
             images = []
             labels = []
@@ -58,6 +58,9 @@ class Dataset(object):
             # ds = ds.batch(batch_size)
             # ds = ds.prefetch(buffer_size=batch_size)
 
+            iterator = tf.data.Iterator.from_string_handle(
+                self.ds_handle_ph, ds.output_types, ds.output_shapes)
+
             if config.datasets_num_private_threads:
 
                 ds = threadpool.override_threadpool(
@@ -71,9 +74,6 @@ class Dataset(object):
             else:
                 self.training_iterator = ds.make_one_shot_iterator()
 
-            iterator = tf.data.Iterator.from_string_handle(
-                self.handle, self.training_iterator.output_types, self.training_iterator.output_shapes)
-
             # self.training_iterator = ds.make_one_shot_iterator()
             for d in range(config.num_gpus):
                 image, label = iterator.get_next()
@@ -81,7 +81,7 @@ class Dataset(object):
                 depth = image.get_shape()[3]
                 image = tf.reshape(
                     image, shape=[batch_size_per_split, size, size, depth])
-                label = tf.reshape(label, [batch_size_per_split, 10])
+                label = tf.reshape(label, [batch_size_per_split, config.num_class])
                 labels.append(label)
                 images.append(image)
                 # labels[d], images[d] = iterator.get_next()

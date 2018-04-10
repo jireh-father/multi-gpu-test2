@@ -220,8 +220,8 @@ class Trainer:
     def init_dataset(self):
         self.train_dataset = Dataset(self.sess, self.config.batch_size, self.config.use_train_shuffle, True,
                                      self.config, self.dataset_path, self.input_size)
-        # self.validation_dataset = Dataset(self.sess, self.config.validation_batch_size, False, False, self.config,
-        #                                   self.dataset_path, self.input_size)
+        self.validation_dataset = Dataset(self.sess, self.config.validation_batch_size, False, False, self.config,
+                                          self.dataset_path, self.input_size)
 
     def train(self, epoch):
         dataset_path = os.path.join(self.config.dataset_dir,
