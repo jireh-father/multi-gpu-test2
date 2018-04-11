@@ -112,6 +112,9 @@ class Dataset(object):
 
     def init_multiple(self):
         self.training_handle = self.sess.run(self.training_iterator.string_handle())
+
+        self.sess.run(self.training_iterator.initializer,
+                      feed_dict={self.input_size: self.config.input_size})
         # self.validation_handle = self.sess.run(self.validation_iterator.string_handle())
 
     def init(self, dataset_path, input_size):
